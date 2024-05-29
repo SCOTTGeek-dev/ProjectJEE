@@ -1,0 +1,174 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <link rel="stylesheet" href="/css/main.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css">
+    <meta charset="UTF-8">
+    <title>Home</title>
+    <style>
+        body {
+            background-image: url('https://as1.ftcdn.net/v2/jpg/02/05/06/38/1000_F_205063857_dTRahzXo0nLpxMTu0Ocx5IfhHMqkrW0L.jpg');
+            background-size: cover;
+            background-repeat: no-repeat;
+            background-attachment: fixed;
+            background-color: #f8f9fa;
+        }
+        .card {
+            box-shadow: 0 4px 8px 0 rgba(0,0,0,0.2);
+            transition: 0.3s;
+            border-radius: 5px;
+        }
+        .card:hover {
+            box-shadow: 0 8px 16px 0 rgba(0,0,0,0.2);
+        }
+        .card-body {
+            padding: 2em;
+        }
+        .navbar {
+            margin-bottom: 2em;
+        }
+        .footer {
+            background-color: #f8f9fa;
+            padding: 2em 0;
+            text-align: center;
+        }
+        #myChart {
+            width: 50%;
+            height: 200px; /* Définir une hauteur pour le canvas */}
+		.blue-text{
+		    color:	black;
+			font-family:'Trebuchet MS', 'Lucida Sans Unicode', 'Lucida Grande', 'Lucida Sans', Arial, sans-serif;
+			background-color: #007BFF;
+		}
+    </style>
+</head>
+<body>
+
+<!-- Navbar copied from login page -->
+<nav class="navbar navbar-expand-lg navbar-dark bg-primary">
+    <a class="navbar-brand" href="/" style="display: flex; align-items: center;">
+        <img src="https://emsi.ma/wp-content/uploads/2020/07/LOGO-2-400x87.png" alt="Logo" style="height: 50px; margin-right: 40px;">
+        <span style="font-family: 'Trebuchet MS', 'Lucida Sans Unicode', 'Lucida Grande', 'Lucida Sans', Arial, sans-serif;">Project Manager</span>
+    </a>
+    <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+        <span class="navbar-toggler-icon"></span>
+    </button>
+    <div class="collapse navbar-collapse" id="navbarNav">
+        <ul class="navbar-nav ml-auto">
+            <li class="nav-item">
+                <a class="nav-link" href="/projects">Projects</a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" href="/items">Items</a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" href="/members">Members</a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" href="https://github.com/SCOTTGeek-dev/ProjectJEE">Notre dépot GitHub</a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" href="/login">LogOut</a>
+            </li>
+        </ul>
+    </div>
+</nav>
+
+<main role="main">
+    <div class="position-relative overflow-hidden p-3 p-md-5 m-md-3 text-center bg-light">
+		<div class="col-md-5 p-lg-5 mx-auto my-5">
+		           <h1 class="display-4 font-weight-normal" style="font-family: 'Gill Sans', 'Gill Sans MT', Calibri, 'Trebuchet MS', sans-serif;" >Gestion de projet avec "LegendsProject"</h1>
+		           <p class="lead font-weight-normal">"Simplifiez la gestion de vos projets et garantissez le succès à chaque étape avec notre solution intuitive et performante."</p>
+		           <a class="btn btn-outline-secondary" th:href="@{/chart}">Statistiques des projets en cours</a>
+		       </div>
+        <div class="product-device shadow-sm d-none d-md-block"></div>
+        <div class="product-device product-device-2 shadow-sm d-none d-md-block"></div>
+    </div>
+
+	<h3 class="blue-text text-center">Application conviviale simple de gestion de projets</h3>
+    <br>
+    <div class="container">
+        <div class="row">
+            <div class="col-sm">
+                <div class="card">
+                    <div class="card-body">
+                        <h5 class="card-title"><i class="fas fa-project-diagram"></i> Administration de projet</h5>
+                        <p class="card-text">Gères le projet de ton équipe.</p>
+                        <a class="btn btn-primary" href="/projects">Projets</a>
+                    </div>
+                </div>
+            </div>
+            <div class="col-sm">
+                <div class="card">
+                    <div class="card-body">
+                        <h5 class="card-title"><i class="fas fa-tasks"></i>	Administration d'Items</h5>
+                        <p class="card-text">Gères les items de ton équipe.</p>
+                        <a class="btn btn-primary" href="/items">Items</a>
+                    </div>
+                </div>
+            </div>
+            <div class="col-sm">
+                <div class="card">
+                    <div class="card-body">
+                        <h5 class="card-title"><i class="fas fa-users"></i>La liste des membres</h5>
+                        <p class="card-text">Gères les membres de ton équipe.</p>
+                        <a class="btn btn-primary" href="/members">Membres</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <br>
+        <div class="row" id="trendingProjects">
+            <!-- Trending projects will be dynamically added here -->
+        </div>
+        <br>
+        <div class="row">
+            <div class="col-12">
+                <canvas id="myChart"></canvas>
+            </div>
+        </div>
+    </div>
+</main>
+
+<footer class="footer">
+    <div class="container">
+        <p class="m-0">© 2024 Gestion de projet avec Spring Boot</p>
+        <p class="m-0"><a href="#">Privacy Policy</a> </p>
+		        <p class="m-0">© 2024 Gestion de projet avec Spring Boot</p>
+		        <p class="m-0"><a href="#">Privacy Policy</a> | <a href="#">Terms of Service</a></p>
+		    </div>
+		</footer>
+		
+		<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+		<script src="https://code.jquery.com/jquery-3.5.1.slim.min.js" integrity="sha384-DfXdz2htPH0lsSSs5nCTpuj/zy4C+OGpamoFVy38MVBnE+IbbVYUew+OrCXaRkfj" crossorigin="anonymous"></script>
+		<script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.1/dist/umd/popper.min.js" integrity="sha384-9/reFTGAW83EW2RDu2S0VKaIzap3H66lZH81PoYlFhbGU+6BZp6G7niu735Sk7lN" crossorigin="anonymous"></script>
+		<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js" integrity="sha384-B4gt1jrGC7Jh4AgTPSdUtOBvfO8shuf57BaghqFfPlYxofvL8/KUEfYiJOMMV+rV" crossorigin="anonymous"></script>
+		
+		<script>
+		    // Fetch trending projects data
+		    fetch('https://api.github.com/search/repositories?q=stars:>1&sort=stars&order=desc')
+		        .then(response => response.json())
+		        .then(data => {
+		            const trendingProjectsDiv = document.getElementById('trendingProjects');
+		            data.items.slice(0, 3).forEach(project => {
+		                const cardDiv = document.createElement('div');
+		                cardDiv.classList.add('col-sm');
+		                cardDiv.innerHTML = `
+		                    <div class="card">
+		                        <div class="card-body">
+		                            <h5 class="card-title">${project.name}</h5>
+		                            <p class="card-text">${project.description}</p>
+		                            <a href="${project.html_url}" class="btn btn-primary">View on GitHub</a>
+		                        </div>
+		                    </div>
+		                `;
+		                trendingProjectsDiv.appendChild(cardDiv);
+		            });
+		        })
+		        .catch(error => console.error('Error fetching trending projects:', error));
+		</script>
+		
+		</body>
+		</html>
+		

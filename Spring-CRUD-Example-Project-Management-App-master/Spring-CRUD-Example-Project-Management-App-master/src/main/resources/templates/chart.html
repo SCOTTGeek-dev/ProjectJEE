@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Chart Example</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body>
+    <canvas id="myChart"></canvas>
+
+    <script>
+        async function fetchTeamMembers() {
+            const response = await fetch('/api/v1/members');
+            const teamMembers = await response.json();
+            return teamMembers;
+        }
+
+        async function createChart() {
+            const teamMembers = await fetchTeamMembers();
+            const labels = teamMembers.map(member => member.firstName + ' ' + member.lastName); // Utilise le nom complet de chaque membre
+            const data = teamMembers.map(() => 1); // Chaque membre de l'équipe compte pour 1
+
+            var ctx = document.getElementById('myChart').getContext('2d');
+            var myChart = new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: labels,
+                    datasets: [{
+                        label: 'Team Members',
+                        data: data,
+                        backgroundColor: 'rgba(75, 192, 192, 0.2)',
+                        borderColor: 'rgba(75, 192, 192, 1)',
+                        borderWidth: 1
+                    }]
+                },
+                options: {
+                    scales: {
+                        y: {
+                            beginAtZero: true
+                        }
+                    }
+                }
+            });
+        }
+        document.addEventListener('DOMContentLoaded', createChart);
+    </script>
+</body>
+</html>

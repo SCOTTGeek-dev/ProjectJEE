@@ -1,0 +1,66 @@
+package com.mihneacristian.project_tracker;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
+import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
+import org.springframework.security.config.annotation.web.builders.HttpSecurity;
+import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
+import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
+import org.springframework.security.crypto.password.PasswordEncoder;
+
+@Configuration
+@EnableWebSecurity
+public class SecurityConfig extends WebSecurityConfigurerAdapter {
+
+    @Autowired
+    private CustomAuthenticationSuccessHandler customAuthenticationSuccessHandler;
+
+    @Override
+    protected void configure(HttpSecurity http) throws Exception {
+        http
+            .cors() // Ajoute la configuration CORS
+            .and()
+            .authorizeRequests()
+                .antMatchers("/api/v1/**").permitAll() 
+                .antMatchers("/", "/home", "/public/**").permitAll() // Pages publiques
+                .antMatchers("/main_page.html").hasRole("ADMIN") // Page pour les administrateurs
+                .antMatchers("/main_page_user.html").hasRole("USER") // Page pour les utilisateurs
+                .anyRequest().authenticated() // Toutes les autres pages nécessitent une authentification
+                .and()
+            .formLogin()
+                .loginPage("/login") // Page de connexion personnalisée
+                .permitAll()
+                .failureUrl("/error.html") // Redirige vers /login avec le paramètre error=true en cas d'échec de l'authentification
+                .successHandler(customAuthenticationSuccessHandler) // Utilisation de notre gestionnaire de succès personnalisé
+                .and()
+            .logout()
+                .permitAll();
+    }
+
+    @Override
+    protected void configure(AuthenticationManagerBuilder auth) throws Exception {
+        auth
+            .inMemoryAuthentication()
+                .withUser("user").password(passwordEncoder().encode("password")).roles("USER")
+                .and()
+                .withUser("admin").password(passwordEncoder().encode("admin")).roles("ADMIN");
+    }
+
+
+    @Bean
+    public PasswordEncoder passwordEncoder() {
+        return new BCryptPasswordEncoder(); // Algorithme BCrypt, qui chiffre les données de manière aléatoire
+    }
+
+    @Bean
+    public CorsConfigurationSource corsConfigurationSource() {
+        CorsConfiguration configuration = new CorsConfiguration();
+        configuration.setAllowedOrigins(Arrays.asList("*")); // Autorise les requêtes depuis tous les origines
+        configuration.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "DELETE", "OPTIONS")); // Méthodes HTTP autorisées
+        configuration.setAllowedHeaders(Arrays.asList("*")); // Tous les en-têtes HTTP autorisés
+        UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
+        source.registerCorsConfiguration("/**", configuration);
+        return source;
+    }
+}

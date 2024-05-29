@@ -1,0 +1,36 @@
+package com.mihneacristian.project_tracker;
+
+import java.io.IOException;
+
+import javax.servlet.http.HttpServletRequest;
+
+import org.apache.tomcat.util.net.openssl.ciphers.Authentication;
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.web.authentication.AuthenticationSuccessHandler;
+import org.springframework.stereotype.Component;
+
+@Component
+public class CustomAuthenticationSuccessHandler implements AuthenticationSuccessHandler {
+
+    public void onAuthenticationSuccess(HttpServletRequest request, HttpServletRequest response, Authentication authentication) throws IOException, ServletException {
+        boolean isAdmin = false;
+        boolean isUser = false;
+        
+        for (GrantedAuthority authority : authentication.getAuthorities()) {
+            if (authority.getAuthority().equals("ADMIN")) {
+                isAdmin = true;
+            } else if (authority.getAuthority().equals("USER")) {
+                isUser = true;
+            }
+        }
+        
+        if (isAdmin) {
+            response.sendRedirect("/main_page.html");
+        } else if (isUser) {
+            response.sendRedirect("/main_page_user.html");
+        } else {
+            // Si aucun rôle n'est trouvé, rediriger vers une page par défaut ou la page d'accueil
+            response.sendRedirect("/default_page.html");
+        }
+    }
+}

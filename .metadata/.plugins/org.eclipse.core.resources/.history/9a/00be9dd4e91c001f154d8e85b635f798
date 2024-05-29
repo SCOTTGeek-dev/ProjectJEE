@@ -1,0 +1,57 @@
+package com.mihneacristian.project_tracker;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
+import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
+import org.springframework.security.config.annotation.web.builders.HttpSecurity;
+import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
+import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.security.crypto.password.PasswordEncoder;
+
+@Configuration
+@EnableWebSecurity
+public class SecurityConfig extends WebSecurityConfigurerAdapter {
+
+    @Autowired
+    private CustomAuthenticationSuccessHandler customAuthenticationSuccessHandler;
+
+    @Override
+    protected void configure(HttpSecurity http) throws Exception {
+        http
+            .authorizeRequests()
+                // Autoriser l'accès à la page de connexion et à toutes les ressources pour tous les utilisateurs
+                .antMatchers("/login", "/css/**", "/js/**", "/images/**").permitAll()
+                // Autoriser l'accès aux URL spécifiques pour les utilisateurs authentifiés
+                .antMatchers("/projects", "/items", "/members").authenticated()
+                // Autoriser l'accès à toutes les autres URL pour les utilisateurs authentifiés avec le rôle ADMIN
+                .antMatchers("/**").hasRole("ADMIN")
+                .and()
+            .formLogin()
+                .loginPage("/login")
+                .permitAll()
+                .failureUrl("/")
+                .successHandler(customAuthenticationSuccessHandler)
+                .and()
+            .logout()
+                .permitAll()
+                .and()
+            .csrf().disable(); // Désactive CSRF pour les tests
+    }
+
+    @Override
+    protected void configure(AuthenticationManagerBuilder auth) throws Exception {
+        auth
+            .inMemoryAuthentication()
+                .withUser("user").password(passwordEncoder().encode("{noop}password")).roles("USER")
+                .and()
+                .withUser("admin").password(passwordEncoder().encode("{noop}admin")).roles("ADMIN");
+    }
+
+
+    @Bean
+    public PasswordEncoder passwordEncoder() {
+        return new BCryptPasswordEncoder(); // Algorithme BCrypt, qui chiffre les données de manière aléatoire
+    }
+}
